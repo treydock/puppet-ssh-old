@@ -64,11 +64,7 @@ class ssh::server (
     $sshd_config_subsystem_notify = undef
   }
 
-  package { 'openssh-server':
-    ensure  => present,
-    name    => $package_name,
-    before  => [ Service['ssh'], File['/etc/ssh/sshd_config'] ],
-  }
+  include ssh::server::install
 
   service { 'ssh':
     ensure      => $service_ensure_real,

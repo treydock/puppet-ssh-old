@@ -7,14 +7,7 @@ describe 'ssh::server' do
 
   it { should create_class('ssh::server') }
   it { should contain_class('ssh::params') }
-
-  it do
-    should contain_package('openssh-server').with({
-      'ensure'    => 'present',
-      'name'      => 'openssh-server',
-      'before'    => ['Service[ssh]', 'File[/etc/ssh/sshd_config]'],
-    })
-  end
+  it { should include_class('ssh::server::install') }
 
   it do
     should contain_service('ssh').with({
