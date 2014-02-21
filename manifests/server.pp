@@ -65,7 +65,7 @@ class ssh::server (
     $sshd_config_subsystem_notify = undef
   }
 
-  if !$allow_users or $allow_users == 'UNSET' {
+  if !$allow_users or $allow_users == 'UNSET' or empty($allow_users) {
     $allow_users_ensure = 'absent'
     $allow_users_real   = undef
   } else {
@@ -73,7 +73,7 @@ class ssh::server (
     $allow_users_real   = $allow_users
   }
 
-  if !$allow_groups or $allow_groups == 'UNSET' {
+  if !$allow_groups or $allow_groups == 'UNSET' or empty($allow_groups) {
     $allow_groups_ensure = 'absent'
     $allow_groups_real   = undef
   } else {

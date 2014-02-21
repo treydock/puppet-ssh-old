@@ -92,6 +92,30 @@ describe 'ssh::server' do
     end
   end
 
+  context "when allow_users => ['foo','bar']" do
+    let(:params) {{ :allow_users => ['foo','bar'] }}
+    it { should contain_sshd_config('AllowUsers').with_ensure('present') }
+    it { should contain_sshd_config('AllowUsers').with_value(['foo','bar']) }
+  end
+
+  context "when allow_groups => ['foo','bar']" do
+    let(:params) {{ :allow_groups => ['foo','bar'] }}
+    it { should contain_sshd_config('AllowGroups').with_ensure('present') }
+    it { should contain_sshd_config('AllowGroups').with_value(['foo','bar']) }
+  end
+
+  context "when allow_users is an empty Array" do
+    let(:params) {{ :allow_users => [] }}
+    it { should contain_sshd_config('AllowUsers').with_ensure('absent') }
+    it { should contain_sshd_config('AllowUsers').without_value }
+  end
+
+  context "when allow_groups is an empty Array" do
+    let(:params) {{ :allow_groups => [] }}
+    it { should contain_sshd_config('AllowGroups').with_ensure('absent') }
+    it { should contain_sshd_config('AllowGroups').without_value }
+  end
+
   context "with sshd_configs defined" do
     let :params do
       {
