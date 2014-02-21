@@ -12,6 +12,7 @@ group :development, :test do
   # Needed to use latest serverspec gem
   # PR submitted: https://github.com/puppetlabs/rspec-system-serverspec/pull/3
   gem 'rspec-system-serverspec', :git => 'git://github.com/nagas/rspec-system-serverspec.git', :branch => 'serverspec/0.x'
+  gem 'vagrant-wrapper'
 end
 
 if puppetversion = ENV['PUPPET_GEM_VERSION']

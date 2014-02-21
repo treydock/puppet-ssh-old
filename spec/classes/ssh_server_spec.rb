@@ -29,7 +29,7 @@ describe 'ssh::server' do
     })
   end
 
-  it { should have_sshd_config_resource_count(5) }
+  it { should have_sshd_config_resource_count(7) }
 
   [
     {'name' => 'PasswordAuthentication', 'value' => 'yes'},
@@ -53,6 +53,24 @@ describe 'ssh::server' do
     end
   end
 
+  [
+    {'name' => 'AllowUsers', 'ensure' => 'absent', 'value' => nil},
+    {'name' => 'AllowGroups', 'ensure' => 'absent', 'value' => nil},
+  ].each do |h|
+    it do
+      should contain_sshd_config(h['name']).with({
+        'ensure'  => h['ensure'],
+        'target'  => '/etc/ssh/sshd_config',
+        'notify'  => 'Service[ssh]',
+        'value'   => h['value'],
+      })
+    end
+
+    context 'with service_authrestart => false' do
+      let(:params) {{ :service_autorestart => false }}
+      it { should contain_sshd_config(h['name']).with_notify(nil) }
+    end
+  end
 
   it { should have_sshd_config_subsystem_resource_count(1) }
 
@@ -77,14 +95,14 @@ describe 'ssh::server' do
   context "with sshd_configs defined" do
     let :params do
       {
-        :sshd_configs => {'AllowUsers' => { 'value' => ['foo', 'bar'] }},
+        :sshd_configs => {'DenyUsers' => { 'value' => ['foo', 'bar'] }},
       }
     end
 
-    it { should have_sshd_config_resource_count(6) }
+    it { should have_sshd_config_resource_count(8) }
 
     it do
-      should contain_sshd_config('AllowUsers').with({
+      should contain_sshd_config('DenyUsers').with({
         'ensure'  => 'present',
         'target'  => '/etc/ssh/sshd_config',
         'notify'  => 'Service[ssh]',

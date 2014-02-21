@@ -36,6 +36,8 @@ class ssh::server (
   $permit_root_login        = 'without-password',
   $use_pam                  = 'yes',
   $x11_forwarding           = 'yes',
+  $allow_users              = 'UNSET',
+  $allow_groups             = 'UNSET',
   $sshd_configs             = {},
   $subsystem_sftp           = '/usr/libexec/openssh/sftp-server'
 ) inherits ssh::params {
@@ -61,6 +63,22 @@ class ssh::server (
   } else {
     $sshd_config_notify           = undef
     $sshd_config_subsystem_notify = undef
+  }
+
+  if !$allow_users or $allow_users == 'UNSET' {
+    $allow_users_ensure = 'absent'
+    $allow_users_real   = undef
+  } else {
+    $allow_users_ensure = 'present'
+    $allow_users_real   = $allow_users
+  }
+
+  if !$allow_groups or $allow_groups == 'UNSET' {
+    $allow_groups_ensure = 'absent'
+    $allow_groups_real   = undef
+  } else {
+    $allow_groups_ensure = 'present'
+    $allow_groups_real   = $allow_groups
   }
 
   include ssh::server::install
@@ -93,6 +111,8 @@ class ssh::server (
   sshd_config { 'PermitRootLogin': value => $permit_root_login }
   sshd_config { 'UsePAM': value => $use_pam }
   sshd_config { 'X11Forwarding': value => $x11_forwarding }
+  sshd_config { 'AllowUsers': ensure => $allow_users_ensure, value => $allow_users_real }
+  sshd_config { 'AllowGroups': ensure => $allow_groups_ensure, value => $allow_groups_real }
 
   if $sshd_configs and !empty($sshd_configs) {
     create_resources(sshd_config, $sshd_configs)

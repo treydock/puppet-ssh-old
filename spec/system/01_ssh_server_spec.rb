@@ -30,6 +30,8 @@ class { 'ssh::server': }
     its(:content) { should match /^PermitRootLogin without-password$/ }
     its(:content) { should match /^UsePAM yes$/ }
     its(:content) { should match /^X11Forwarding yes$/ }
+    its(:content) { should_not match /^AllowUsers.*$/ }
+    its(:content) { should_not match /^AllowGroups.*$/ }
     its(:content) { should match /^Subsystem\s+sftp\s+\/usr\/libexec\/openssh\/sftp-server$/ }
     it { should be_file }
     it { should be_mode 600 }
@@ -40,11 +42,7 @@ class { 'ssh::server': }
   context 'should set AllowUsers' do
     pp =<<-EOS
 class { 'ssh::server':
-  sshd_configs => {
-    'AllowUsers' => {
-      'value' => ['root','vagrant'],
-    }
-  }
+  allow_users => ['root','vagrant'],
 }
     EOS
   
@@ -72,6 +70,7 @@ class { 'ssh::server':
       its(:content) { should match /^UsePAM yes$/ }
       its(:content) { should match /^X11Forwarding yes$/ }
       its(:content) { should match /^AllowUsers root vagrant$/ }
+      its(:content) { should_not match /^AllowGroups.*$/ }
       its(:content) { should match /^Subsystem\s+sftp\s+\/usr\/libexec\/openssh\/sftp-server$/ }
       it { should be_file }
       it { should be_mode 600 }
