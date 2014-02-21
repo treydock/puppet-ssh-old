@@ -1,5 +1,5 @@
 name    'treydock-ssh'
-version '0.0.1'
+version '1.0.0'
 source 'git://github.com/treydock/puppet-ssh.git'
 author 'treydock'
 license 'Apache License, Version 2.0'

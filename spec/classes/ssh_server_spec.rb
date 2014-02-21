@@ -7,7 +7,7 @@ describe 'ssh::server' do
 
   it { should create_class('ssh::server') }
   it { should contain_class('ssh::params') }
-  it { should include_class('ssh::server::install') }
+  it { should contain_class('ssh::server::install') }
 
   it do
     should contain_service('ssh').with({

@@ -6,7 +6,7 @@ describe 'ssh::server::install' do
   let(:facts) { default_facts }
 
   it { should create_class('ssh::server::install') }
-  it { should include_class('ssh::server') }
+  it { should contain_class('ssh::server') }
 
   it do
     should contain_package('openssh-server').with({
