@@ -93,25 +93,6 @@ describe 'ssh::server' do
     end
   end
 
-  context "with sshd_config_subsystems defined" do
-    let :params do
-      {
-        :sshd_config_subsystems => {'sftp' => { 'command' => 'internal-sftp' }},
-      }
-    end
-
-    it { should have_sshd_config_subsystem_resource_count(1) }
-
-    it do
-      should contain_sshd_config_subsystem('sftp').with({
-        'ensure'  => 'present',
-        'target'  => '/etc/ssh/sshd_config',
-        'notify'  => 'Service[ssh]',
-        'command' => 'internal-sftp',
-      })
-    end
-  end
-
   # Test service ensure and enable 'magic' values
   [
     'undef',
@@ -128,13 +109,24 @@ describe 'ssh::server' do
     end
   end
 
-  # Test verify_boolean parameters
+  # Test validate_bool parameters
   [
     'service_autorestart',
-  ].each do |bool_param|
-    context "with #{bool_param} => 'foo'" do
-      let(:params) {{ bool_param.to_sym => 'foo' }}
-      it { expect { should create_class('ssh') }.to raise_error(Puppet::Error, /is not a boolean/) }
+  ].each do |param|
+    context "with #{param} => 'foo'" do
+      let(:params) {{ param.to_sym => 'foo' }}
+      it { expect { should create_class('ssh::server') }.to raise_error(Puppet::Error, /is not a boolean/) }
+    end
+  end
+
+  # Test validate_hash parameters
+  [
+    'sshd_configs',
+    'sshd_config_subsystems',
+  ].each do |param|
+    context "with #{param} => 'foo'" do
+      let(:params) {{ param.to_sym => 'foo' }}
+      it { expect { should create_class('ssh::server') }.to raise_error(Puppet::Error, /is not a Hash/) }
     end
   end
 end

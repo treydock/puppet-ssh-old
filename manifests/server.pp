@@ -43,6 +43,7 @@ class ssh::server (
 
   validate_bool($service_autorestart)
   validate_hash($sshd_configs)
+  validate_hash($sshd_config_subsystems)
 
   # This gives the option to not manage the service 'ensure' state.
   $service_ensure_real  = $service_ensure ? {
@@ -83,36 +84,32 @@ class ssh::server (
   }
 
   # sshd_config resource creation
-  $sshd_config_parameters = {
-    'PasswordAuthentication' => { 'value' => $password_authentication },
-    'PermitEmptyPasswords' => { 'value' => $permit_empty_passwords },
-    'PermitRootLogin' => { 'value' => $permit_root_login },
-    'UsePAM' => { 'value' => $use_pam },
-    'X11Forwarding' => { 'value' => $x11_forwarding },
+  Sshd_config {
+    ensure  => present,
+    target  => $config_path,
+    notify  => $sshd_config_notify,
   }
 
-  $sshd_config_resources = merge($sshd_config_parameters, $sshd_configs)
+  sshd_config { 'PasswordAuthentication': value => $password_authentication }
+  sshd_config { 'PermitEmptyPasswords': value => $permit_empty_passwords }
+  sshd_config { 'PermitRootLogin': value => $permit_root_login }
+  sshd_config { 'UsePAM': value => $use_pam }
+  sshd_config { 'X11Forwarding': value => $x11_forwarding }
 
-  $sshd_config_defaults = {
-    'ensure'  => 'present',
-    'target'  => $config_path,
-    'notify'  => $sshd_config_notify,
+  if $sshd_configs and !empty($sshd_configs) {
+    create_resources(sshd_config, $sshd_configs)
   }
-
-  create_resources(sshd_config, $sshd_config_resources, $sshd_config_defaults)
 
   # sshd_config_subsystem resource creation
-  $sshd_config_subsystem_parameters = {
-    'sftp' => { 'command' => $subsystem_sftp },
+  Sshd_config_subsystem {
+    ensure  => present,
+    target  => $config_path,
+    notify  => $sshd_config_subsystem_notify,
   }
 
-  $sshd_config_subsystem_resources = merge($sshd_config_subsystem_parameters, $sshd_config_subsystems)
+  sshd_config_subsystem { 'sftp': command => $subsystem_sftp }
 
-  $sshd_config_subsystem_defaults = {
-    'ensure'  => 'present',
-    'target'  => $config_path,
-    'notify'  => $sshd_config_subsystem_notify,
+  if $sshd_config_subsystems and !empty($sshd_config_subsystems) {
+    create_resources(sshd_config_subsystem, $sshd_config_subsystems)
   }
-
-  create_resources(sshd_config_subsystem, $sshd_config_subsystem_resources, $sshd_config_subsystem_defaults)
 }
