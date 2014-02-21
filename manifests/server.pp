@@ -37,13 +37,11 @@ class ssh::server (
   $use_pam                  = 'yes',
   $x11_forwarding           = 'yes',
   $sshd_configs             = {},
-  $subsystem_sftp           = '/usr/libexec/openssh/sftp-server',
-  $sshd_config_subsystems   = {}
+  $subsystem_sftp           = '/usr/libexec/openssh/sftp-server'
 ) inherits ssh::params {
 
   validate_bool($service_autorestart)
   validate_hash($sshd_configs)
-  validate_hash($sshd_config_subsystems)
 
   # This gives the option to not manage the service 'ensure' state.
   $service_ensure_real  = $service_ensure ? {
@@ -108,8 +106,4 @@ class ssh::server (
   }
 
   sshd_config_subsystem { 'sftp': command => $subsystem_sftp }
-
-  if $sshd_config_subsystems and !empty($sshd_config_subsystems) {
-    create_resources(sshd_config_subsystem, $sshd_config_subsystems)
-  }
 }

@@ -122,7 +122,6 @@ describe 'ssh::server' do
   # Test validate_hash parameters
   [
     'sshd_configs',
-    'sshd_config_subsystems',
   ].each do |param|
     context "with #{param} => 'foo'" do
       let(:params) {{ param.to_sym => 'foo' }}
